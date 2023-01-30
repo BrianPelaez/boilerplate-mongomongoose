@@ -1,32 +1,65 @@
-require('dotenv').config();
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
 
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log("Conexión a DB"))
+  .catch((err) => console.log("Error de conexión"));
 
-let Person;
+  const personSchema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    favoriteFoods: [String],
+ 
+
+  })
+
+  const Person = mongoose.model('Person', personSchema)
+
+  const newPerson = new Person({
+    name: "Brian Pelaez",
+    age: 29,
+    favoriteFoods: ["Apple","Pizza"],
+
+  })
+  const supermario = new Person({ name: 'Super Mario', age: 40, favoriteFoods: ['Spaghetti'] });
+  const luigi = new Person({ name: 'Luigi', age: 24, favoriteFoods: ['Spaghetti'] });
+  const arrayOfPeople = [supermario, luigi];
+
 
 const createAndSavePerson = (done) => {
-  done(null /*, data*/);
+  newPerson.save((err, data) => err ? done(err) : done(null, data));
 };
 
 const createManyPeople = (arrayOfPeople, done) => {
-  done(null /*, data*/);
+  Person.create(arrayOfPeople, (err, data) => err ? done(err) : done(null, data));
 };
 
 const findPeopleByName = (personName, done) => {
-  done(null /*, data*/);
+  Person.find({name: personName}, (err, person) => err ? done(err) : done(null, person))
 };
 
 const findOneByFood = (food, done) => {
-  done(null /*, data*/);
+  Person.findOne({favoriteFoods: food}, (err, person) => err ? done(err) : done(null, person))
 };
 
 const findPersonById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findById({_id: personId}, (err, person) => err ? done(err) : done(null, person))
 };
 
 const findEditThenSave = (personId, done) => {
   const foodToAdd = "hamburger";
-
-  done(null /*, data*/);
+  Person.findById(personId, (err, person) => {
+    if (err) return done(err);
+    person.favoriteFoods.push(foodToAdd);
+    person.save((err, updatedPerson) => (err) ? done(err) : done(null, updatedPerson));
+})
+  //findPerson.favoriteFoods.push(foodToAdd)
+  //findPerson.save((err, data) => err ? done(err) : done(null, data))
+  
 };
 
 const findAndUpdate = (personName, done) => {
@@ -50,6 +83,8 @@ const queryChain = (done) => {
 
   done(null /*, data*/);
 };
+
+//Source: https://stackoverflow.com/questions/38485575
 
 /** **Well Done !!**
 /* You completed these challenges, let's go celebrate !
