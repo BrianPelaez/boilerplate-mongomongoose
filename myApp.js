@@ -77,26 +77,38 @@ const findEditThenSave = (personId, done) => {
 const findAndUpdate = (personName, done) => {
   const ageToSet = 20;
   //console.log(personName)
-  Person.findOneAndUpdate({ name: personName }, { age: ageToSet }, { new: true }, (err, updatedPerson) =>
-        (err) ? done(err) : done(null, updatedPerson)
-    )
-
+  Person.findOneAndUpdate(
+    { name: personName },
+    { age: ageToSet },
+    { new: true },
+    (err, updatedPerson) => (err ? done(err) : done(null, updatedPerson))
+  );
 };
 
 const removeById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findByIdAndRemove({ _id: personId }, (err, person) => {
+    err ? done(err) : done(null, person);
+  });
 };
 
 const removeManyPeople = (done) => {
   const nameToRemove = "Mary";
-
-  done(null /*, data*/);
+  Person.remove({ name: nameToRemove }, (err, person) => {
+    err ? done(err) : done(null, person);
+  });
 };
 
-const queryChain = (done) => {
-  const foodToSearch = "burrito";
+var queryChain = function (done) {
+  var foodToSearch = "burrito";
 
-  done(null /*, data*/);
+  Person.find({ favoriteFoods: foodToSearch })
+    .sort({ name: "asc" })
+    .limit(2)
+    .select("-age")
+    .exec(function (err, person) {
+      console.log(person)
+      err ? done(err) : done(null, person)
+    });
 };
 
 //Source: https://stackoverflow.com/questions/38485575
